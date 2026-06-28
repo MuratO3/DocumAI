@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Понятный договор | ИИ-ассистент</title>
+    <meta name="description" content="Отправьте договор — ИИ-ассистент объяснит его простым языком для Узбекистана." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <div class="brand-mark">📄</div>
+          <div>
+            <h1>Понятный договор</h1>
+            <p>ИИ-ассистент объясняет сложные документы простым языком</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-layout">
+          <div class="hero-copy">
+            <p class="eyebrow" id="heroEyebrow">Для жителей Узбекистана</p>
+            <h2 id="heroTitle">Отправьте договор — и ИИ-консультант объяснит его понятно и ясно.</h2>
+            <p id="heroText">Вы получите простое объяснение прав, обязанностей, сроков и рисков. Подходит для аренды, трудового договора, соглашений и покупок.</p>
+            <ul class="benefits-list">
+              <li id="benefit1">Понятный пересказ на простом языке</li>
+              <li id="benefit2">Объяснение скрытых условий и опасных пунктов</li>
+              <li id="benefit3">Поддержка на русском и узбекском</li>
+            </ul>
+          </div>
+
+          <div class="form-card">
+            <div class="language-switcher">
+              <span id="langLabel">Язык:</span>
+              <button type="button" class="lang-btn active" data-lang="ru">Русский</button>
+              <button type="button" class="lang-btn" data-lang="uz">O‘zbek</button>
+            </div>
+            <h3 id="formTitle">Единая форма запроса</h3>
+            <form class="contact-form">
+              <label>
+                <span id="nameLabel">Ваше имя</span>
+                <input id="nameInput" type="text" placeholder="Азиз" />
+              </label>
+              <label>
+                <span id="phoneLabel">Телефон</span>
+                <input id="phoneInput" type="tel" placeholder="+998 90 123 45 67" />
+              </label>
+              <label>
+                <span id="documentTypeLabel">Тип документа</span>
+                <select id="documentTypeSelect">
+                  <option id="docRent">Аренда</option>
+                  <option id="docJob">Трудовой договор</option>
+                  <option id="docAgreement">Соглашение</option>
+                  <option id="docSale">Покупка и продажа</option>
+                  <option id="docOther">Другое</option>
+                </select>
+              </label>
+              <label>
+                <span id="questionLabel">Что нужно понять</span>
+                <textarea id="questionInput" rows="4" placeholder="Например: какие у меня права, какие штрафы и что будет при досрочном расторжении?"></textarea>
+              </label>
+              <label>
+                <span id="explanationLangLabel">Язык объяснения</span>
+                <select id="explanationLangSelect">
+                  <option id="langRu">Русский</option>
+                  <option id="langUz">Узбекский</option>
+                  <option id="langBoth">Оба варианта</option>
+                </select>
+              </label>
+              <button type="submit" class="btn btn-primary" id="submitButton">Отправить запрос</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="assistant-section">
+        <div class="container assistant-card">
+          <div class="assistant-header">
+            <h3>ИИ-консультант</h3>
+            <p class="assistant-subtitle">Спросите о договоре простыми словами — и получите короткий и понятный ответ.</p>
+          </div>
+
+          <div class="quick-actions">
+            <button class="quick-chip" data-prompt="Объясни мне риски аренды квартиры простыми словами">Риски аренды</button>
+            <button class="quick-chip" data-prompt="Что важно проверить в трудовом договоре">Трудовой договор</button>
+            <button class="quick-chip" data-prompt="Какие опасные пункты чаще всего встречаются">Опасные пункты</button>
+          </div>
+
+          <div class="upload-panel">
+            <label class="upload-box" for="fileInput">
+              <span class="upload-icon">📎</span>
+              <span>Загрузите PDF, DOCX, JPG, PNG, сканы и другие файлы</span>
+              <input id="fileInput" type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.tif,.tiff,.bmp,.txt,.rtf,.odt" />
+            </label>
+            <div class="upload-hint">Поддерживаются: PDF, DOCX, JPG/JPEG, PNG, TIFF, BMP, TXT</div>
+            <div class="uploaded-files" id="uploadedFiles"></div>
+          </div>
+
+          <div class="assistant-messages" aria-live="polite"></div>
+
+          <div class="assistant-input-row">
+            <input type="text" class="assistant-input" placeholder="Напишите ваш вопрос..." />
+            <button class="assistant-send" type="button">Отправить</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="results-section" id="resultsSection" style="display: none;">
+        <div class="container results-card">
+          <div class="results-header">
+            <button class="btn-back" id="backBtn">← Назад</button>
+            <h2 id="resultsTitle">Анализ договора</h2>
+          </div>
+
+          <div class="results-content">
+            <div class="results-summary" id="resultsSummary"></div>
+
+            <div class="results-grid">
+              <div class="results-block">
+                <h3>🔍 Ключевые пункты</h3>
+                <ul id="keyPointsList"></ul>
+              </div>
+
+              <div class="results-block risks-block">
+                <h3>⚠️ Потенциальные риски</h3>
+                <ul id="risksList"></ul>
+              </div>
+            </div>
+
+            <div class="results-action" id="resultsAction"></div>
+
+            <div class="results-footer">
+              <button class="btn btn-primary" id="continueBtn">Задать ещё вопрос</button>
+              <button class="btn btn-secondary" id="downloadBtn">Сохранить анализ</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Понятный договор. Понятно, безопасно и без лишней сложности.</p>
+      </div>
+    </footer>
+
+    <script src="script.js?v=2"></script>
+  </body>
+</html>
