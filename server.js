@@ -227,7 +227,7 @@ app.post('/api/assistant', upload.array('files', 5), async (req, res) => {
 
     // ИСПОЛЬЗУЕМ GEMINI
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       
       const prompt = `${systemPrompt}\n\nВопрос пользователя: ${message}\n\nСодержимое загруженных файлов:\n${contextText || 'Нет загруженных файлов.'}`;
       
