@@ -3,10 +3,12 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
-const OpenAI = require('openai');
 const pdf = require('pdf-parse');
 const mammoth = require('mammoth');
 const { createWorker } = require('tesseract.js');
+
+// Заменяем OpenAI на Gemini
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 dotenv.config();
 
@@ -26,7 +28,8 @@ app.use(express.static(__dirname, {
   }
 }));
 
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+// Инициализация Gemini вместо OpenAI
+const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 
 function analyzeDocumentType(message, contextText = '') {
   const text = (message + ' ' + contextText).toLowerCase();
@@ -212,7 +215,8 @@ app.post('/api/assistant', upload.array('files', 5), async (req, res) => {
 
     const docType = analyzeDocumentType(message, contextText);
 
-    if (!openai) {
+    // ЕСЛИ НЕТ GEMINI КЛЮЧА — ИСПОЛЬЗУЕМ ЛОКАЛЬНЫЙ РЕЖИМ
+    if (!genAI) {
       const analysis = buildSmartReply(message, lang, docType, contextText);
       return res.json({ 
         reply: analysis.summary,
@@ -221,19 +225,30 @@ app.post('/api/assistant', upload.array('files', 5), async (req, res) => {
       });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Вопрос пользователя: ${message}\n\nСодержимое загруженных файлов:\n${contextText || 'Нет загруженных файлов.'}` }
-      ],
-      temperature: 0.5
-    });
-
-    res.json({ reply: completion.choices[0].message.content });
+    // ИСПОЛЬЗУЕМ GEMINI
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      
+      const prompt = `${systemPrompt}\n\nВопрос пользователя: ${message}\n\nСодержимое загруженных файлов:\n${contextText || 'Нет загруженных файлов.'}`;
+      
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      res.json({ reply: text });
+    } catch (geminiError) {
+      console.error('Gemini error:', geminiError);
+      // Если Gemini не работает — используем локальный режим
+      const analysis = buildSmartReply(message, lang, docType, contextText);
+      return res.json({ 
+        reply: analysis.summary,
+        analysis: analysis,
+        docType: docType
+      });
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ reply: 'Извините, сейчас не удалось обработать запрос. Проверьте API-ключ OpenAI.' });
+    res.status(500).json({ reply: 'Извините, сейчас не удалось обработать запрос.' });
   }
 });
 
